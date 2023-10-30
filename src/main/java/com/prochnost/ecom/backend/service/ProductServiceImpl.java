@@ -3,6 +3,7 @@ package com.prochnost.ecom.backend.service;
 import com.prochnost.ecom.backend.dto.ProductListResponseDTO;
 import com.prochnost.ecom.backend.dto.ProductRequestDTO;
 import com.prochnost.ecom.backend.dto.ProductResponseDTO;
+import com.prochnost.ecom.backend.exceptions.ProductNotFoundException;
 import com.prochnost.ecom.backend.model.Product;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public ProductResponseDTO getProductById(int id) {
+    public ProductResponseDTO getProductById(int id) throws ProductNotFoundException {
         return null;
     }
 
