@@ -1,13 +1,13 @@
-package com.prochnost.ecom.backend.service;
+package com.prochnost.ecom.backend.service.productService;
 
 import com.prochnost.ecom.backend.client.FakeStoreAPIClient;
-import com.prochnost.ecom.backend.dto.*;
+import com.prochnost.ecom.backend.dto.productDto.*;
 import com.prochnost.ecom.backend.exceptions.ProductNotFoundException;
-import com.prochnost.ecom.backend.model.Product;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.prochnost.ecom.backend.mapper.ProductMapper.fakeStoreProductResponseToProductResponse;
 import static com.prochnost.ecom.backend.mapper.ProductMapper.productRequestToFakeStoreProductRequest;
@@ -32,12 +32,17 @@ public class FakeStoreProductServiceImpl implements ProductService{
     }
 
     @Override
-    public ProductResponseDTO getProductById(int id) throws ProductNotFoundException{
-        FakeStoreProductResponseDTO fakeStoreResponse = fakeStoreAPIClient.getProduct(id);
+    public ProductResponseDTO getProductById(UUID id) throws ProductNotFoundException{
+        FakeStoreProductResponseDTO fakeStoreResponse = fakeStoreAPIClient.getProduct(1);
         if(isNull(fakeStoreResponse)){
             throw new ProductNotFoundException("Product not found with id : " + id);
         }
         return fakeStoreProductResponseToProductResponse(fakeStoreResponse);
+    }
+
+    @Override
+    public ProductResponseDTO getProductByTitle(String title) throws ProductNotFoundException {
+        return null;
     }
 
     @Override
@@ -48,12 +53,13 @@ public class FakeStoreProductServiceImpl implements ProductService{
     }
 
     @Override
-    public boolean deleteProduct(int id) {
-        return fakeStoreAPIClient.deleteProduct(id);
+    public boolean deleteProduct(UUID id) {
+        return fakeStoreAPIClient.deleteProduct(1);
     }
 
     @Override
-    public Product updateProduct(int id, Product updatedProduct) {
-        return null;
+    public boolean updateProduct(UUID id, ProductRequestDTO updatedProduct) throws ProductNotFoundException {
+        FakeStoreProductRequestDTO fakeStoreProductRequestDTO = productRequestToFakeStoreProductRequest(updatedProduct);
+        return fakeStoreAPIClient.updateProduct(1, fakeStoreProductRequestDTO);
     }
 }

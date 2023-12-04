@@ -1,4 +1,4 @@
-package com.prochnost.ecom.backend.dto;
+package com.prochnost.ecom.backend.dto.productDto;
 
 import lombok.Getter;
 import lombok.Setter;

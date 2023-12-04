@@ -1,16 +1,14 @@
-package com.prochnost.ecom.backend.dto;
+package com.prochnost.ecom.backend.dto.productDto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ProductResponseDTO {
-    private int id;
+public class FakeStoreProductRequestDTO {
     private String title;
     private double price;
     private String category;
     private String description;
     private String image;
 }
-

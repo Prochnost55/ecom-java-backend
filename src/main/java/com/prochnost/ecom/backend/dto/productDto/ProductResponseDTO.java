@@ -1,15 +1,18 @@
-package com.prochnost.ecom.backend.dto;
-
+package com.prochnost.ecom.backend.dto.productDto;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
-public class ProductRequestDTO {
+public class ProductResponseDTO {
+    private UUID id;
     private String title;
     private double price;
     private String category;
     private String description;
     private String image;
 }
+
