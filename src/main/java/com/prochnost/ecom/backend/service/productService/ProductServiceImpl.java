@@ -12,6 +12,8 @@ import com.prochnost.ecom.backend.model.Product;
 import com.prochnost.ecom.backend.repository.CategoryRepository;
 import com.prochnost.ecom.backend.repository.PriceRepository;
 import com.prochnost.ecom.backend.repository.ProductRepository;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,6 +35,7 @@ public class ProductServiceImpl implements ProductService{
         this.priceRepository = priceRepository;
     }
     @Override
+    @Cacheable(value = "products")
     public ProductListResponseDTO getAllProducts() {
         List<Product> products =  productRepository.findAll();
         ProductListResponseDTO productListResponseDTO = new ProductListResponseDTO();
@@ -44,6 +47,7 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    @Cacheable(value = "product", key = "#id")
     public ProductResponseDTO getProductById(UUID id) throws ProductNotFoundException {
         Product p = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found with id : " + id));
         return ProductMapper.productToProductResponseDTO(p);
@@ -59,6 +63,18 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
+    public ProductListResponseDTO getProductsByCategory(String categoryName) {
+        List<Product> products = productRepository.findByCategoryCategoryNameIgnoreCase(categoryName);
+        ProductListResponseDTO productListResponseDTO = new ProductListResponseDTO();
+        
+        for(Product p: products){
+            productListResponseDTO.getProductList().add(ProductMapper.productToProductResponseDTO(p));
+        }
+        return productListResponseDTO;
+    }
+
+    @Override
+    @CacheEvict(value = {"products", "product"}, allEntries = true)
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         Product product = ProductMapper.ProductRequestDtoToProduct(productRequestDTO);
         Category category = product.getCategory();

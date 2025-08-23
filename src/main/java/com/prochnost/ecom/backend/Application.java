@@ -4,8 +4,10 @@ import com.prochnost.ecom.backend.service.initService.InitService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
+@EnableCaching
 public class Application implements CommandLineRunner {
 	private InitService initService;
 

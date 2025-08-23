@@ -42,7 +42,30 @@ public class FakeStoreProductServiceImpl implements ProductService{
 
     @Override
     public ProductResponseDTO getProductByTitle(String title) throws ProductNotFoundException {
-        return null;
+        // FakeStore API doesn't support search by title, so we get all products and filter
+        List<FakeStoreProductResponseDTO> allProducts = fakeStoreAPIClient.getAllProducts();
+        
+        for (FakeStoreProductResponseDTO product : allProducts) {
+            if (product.getTitle().equalsIgnoreCase(title)) {
+                return fakeStoreProductResponseToProductResponse(product);
+            }
+        }
+        
+        throw new ProductNotFoundException("Product not found with title: " + title);
+    }
+
+    @Override
+    public ProductListResponseDTO getProductsByCategory(String categoryName) {
+        // FakeStore API doesn't have category filtering, so get all and filter
+        List<FakeStoreProductResponseDTO> allProducts = fakeStoreAPIClient.getAllProducts();
+        ProductListResponseDTO productListResponseDTO = new ProductListResponseDTO();
+        
+        for (FakeStoreProductResponseDTO product : allProducts) {
+            if (product.getCategory().equalsIgnoreCase(categoryName)) {
+                productListResponseDTO.getProductList().add(fakeStoreProductResponseToProductResponse(product));
+            }
+        }
+        return productListResponseDTO;
     }
 
     @Override

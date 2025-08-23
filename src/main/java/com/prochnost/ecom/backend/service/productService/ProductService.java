@@ -11,6 +11,7 @@ public interface ProductService {
     ProductListResponseDTO getAllProducts();
     ProductResponseDTO getProductById(UUID id) throws ProductNotFoundException;
     ProductResponseDTO getProductByTitle(String title) throws ProductNotFoundException;
+    ProductListResponseDTO getProductsByCategory(String categoryName);
     ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
     boolean deleteProduct(UUID id);
     boolean updateProduct(UUID id, ProductRequestDTO updatedProduct) throws  ProductNotFoundException;
