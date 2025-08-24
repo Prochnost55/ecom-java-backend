@@ -50,7 +50,12 @@ public class OrderServiceImpl implements OrderService {
         // Get products by IDs
         List<Product> products = productRepository.findAllById(orderRequestDTO.getProductIds());
         order.setProducts(products);
-        order.setPrice(orderRequestDTO.getTotalPrice());
+        
+        // SECURITY FIX: Calculate price from actual products, don't trust client
+        double calculatedPrice = products.stream()
+                .mapToDouble(Product::getPrice)
+                .sum();
+        order.setPrice(calculatedPrice);
         
         Order savedOrder = orderRepository.save(order);
         return OrderMapper.orderToOrderResponseDTO(savedOrder);
@@ -63,7 +68,12 @@ public class OrderServiceImpl implements OrderService {
                 
         List<Product> products = productRepository.findAllById(orderRequestDTO.getProductIds());
         existingOrder.setProducts(products);
-        existingOrder.setPrice(orderRequestDTO.getTotalPrice());
+        
+        // SECURITY FIX: Calculate price from actual products, don't trust client
+        double calculatedPrice = products.stream()
+                .mapToDouble(Product::getPrice)
+                .sum();
+        existingOrder.setPrice(calculatedPrice);
         
         orderRepository.save(existingOrder);
         return true;
