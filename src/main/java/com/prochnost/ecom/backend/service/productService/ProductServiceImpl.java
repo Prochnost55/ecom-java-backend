@@ -12,6 +12,8 @@ import com.prochnost.ecom.backend.model.Product;
 import com.prochnost.ecom.backend.repository.CategoryRepository;
 import com.prochnost.ecom.backend.repository.PriceRepository;
 import com.prochnost.ecom.backend.repository.ProductRepository;
+import com.prochnost.ecom.backend.service.sync.ProductSyncService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class ProductServiceImpl implements ProductService{
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final PriceRepository priceRepository;
+    
+    @Autowired
+    private ProductSyncService productSyncService;
 
     public ProductServiceImpl(ProductRepository productRepository,
                               CategoryRepository categoryRepository,
@@ -87,17 +92,27 @@ public class ProductServiceImpl implements ProductService{
         product.setPrice(price);
 
         Product savedProduct = productRepository.save(product);
+        
+        // Sync to Elasticsearch
+        productSyncService.syncProductToElasticsearch(savedProduct);
+        
         ProductResponseDTO productResponseDTO = ProductMapper.productToProductResponseDTO(savedProduct);
         return productResponseDTO;
     }
 
     @Override
+    @CacheEvict(value = {"products", "product"}, allEntries = true)
     public boolean deleteProduct(UUID id) {
         productRepository.deleteById(id);
+        
+        // Remove from Elasticsearch
+        productSyncService.removeProductFromElasticsearch(id.toString());
+        
         return true;
     }
 
     @Override
+    @CacheEvict(value = {"products", "product"}, allEntries = true)
     public boolean updateProduct(UUID id, ProductRequestDTO updatedProductDTO) throws ProductNotFoundException{
         Product productToUpdate = productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product does not exist with id : " + id));
         Product updatedProduct = ProductMapper.ProductRequestDtoToProduct(updatedProductDTO);
@@ -116,7 +131,11 @@ public class ProductServiceImpl implements ProductService{
         category.setCategoryName(updatedProduct.getCategory().getCategoryName());
         productToUpdate.setCategory(category);
 
-        productRepository.save(productToUpdate);
+        Product savedProduct = productRepository.save(productToUpdate);
+        
+        // Sync updated product to Elasticsearch
+        productSyncService.syncProductToElasticsearch(savedProduct);
+        
         return true;
     }
 }
